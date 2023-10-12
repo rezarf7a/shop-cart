@@ -1,6 +1,10 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Product.module.css';
+import { useDispatch, useSelector } from 'react-redux';
+
+// actions
+import { addItem, removeItem, increase, decrease } from "../../redux/cart/cartAction"
 
 //icons
 import trashIcon from '../../assets/icons/trash.svg'
@@ -9,11 +13,12 @@ import trashIcon from '../../assets/icons/trash.svg'
 import { shorten, isInCart, quantityCount } from '../../helpers/functions';
 
 //context
-import { CartContext } from '../../context/CartContextProvider';
 
 const Product = ({productData}) => {
 
-    const {state, dispatch} = useContext(CartContext);
+const dispatch = useDispatch();
+const state = useSelector(state => state.cartState)
+
 
     return (
         <div className={styles.container}>
@@ -23,13 +28,13 @@ const Product = ({productData}) => {
             <div className={styles.linkContainer}>
                 <Link to={`/products/${productData.id}`}>more</Link>
                 <div className={styles.buttonContainer}>
-                    {quantityCount(state, productData.id) > 1 && <button onClick={()=> dispatch({type: "DECREASE", payload: productData })} className={styles.smallButton}>-</button>}
-                    {quantityCount(state, productData.id) === 1 && <button onClick={()=> dispatch({type: "REMOVE_ITEM", payload: productData })} className={styles.smallButton}><img src={trashIcon} alt='remove' /></button>}
+                    {quantityCount(state, productData.id) > 1 && <button onClick={()=> dispatch(decrease(productData))} className={styles.smallButton}>-</button>}
+                    {quantityCount(state, productData.id) === 1 && <button onClick={()=> dispatch(removeItem(productData))} className={styles.smallButton}><img src={trashIcon} alt='remove' /></button>}
                     {quantityCount(state, productData.id) > 0 && <span className={styles.counter}>{quantityCount(state, productData.id)}</span>}
                     {
                         isInCart(state, productData.id) ?
-                            <button onClick={() => dispatch({type: 'INCREASE', payload: productData})} className={styles.smallButton}>+</button> :
-                            <button onClick={() => dispatch({type: 'ADD_ITEM', payload: productData})}>add to cart</button>
+                            <button onClick={() => dispatch(increase(productData))} className={styles.smallButton}>+</button> :
+                            <button onClick={() => dispatch(addItem(productData))}>add to cart</button>
                     }
                 </div>
             </div>
